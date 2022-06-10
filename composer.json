@@ -1,0 +1,5 @@
+{
+    "require": {
+        "btcpayserver/btcpayserver-greenfield-php": "^1.3"
+    }
+}
