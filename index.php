@@ -1,10 +1,18 @@
 <?php
-
+/**
+ * @var string $btcpay_url
+ * @var string $storeid
+ * @var string $apikey
+ * @var string $lbapikey
+ * @var string $resellerid
+ * @var string $checksum_secret
+ * @var string $reseller_base_url
+ */
 // Include autoload file.
 require __DIR__ . '/vendor/autoload.php';
 
 // redirect user to setup.php if DB doesn't exist
-if (!file_exists(__DIR__ . '/../private/db.sqlite')) {
+if (!file_exists(__DIR__ . '/private/config.inc.php')) {
    header('Location: setup.php');
    exit(0);
 }
@@ -14,110 +22,39 @@ use BTCPayServer\Client\Invoice;
 use BTCPayServer\Client\InvoiceCheckoutOptions;
 use BTCPayServer\Util\PreciseNumber;
 
-// Fill in with your BTCPay Server data.
-$apiKey = 'YOUR_GREENFIELD_API_KEY';
-$host = 'https://BTCPAY_URL';
-$storeId = 'STORE_ID';
+require __DIR__ . '/private/config.inc.php';
 
 require("functions.php");	//file which has required functions
 
-// TODO replace mariadb with sqlite
-$servername = "localhost";
-$username = "user";
-$password = "password";
-$dbname = "DBNAME";
-// from the ResellerClub/Resell.biz Paymentgateway settings page
-$key = "ENCRYPTION_KEY_LOGICBOXES";
-
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-} 
-
-// store GET Parameters from ResellerClub in the database
-// prepare and bind
-$stmt = $conn->prepare("INSERT INTO payments (paymentTypeId, transId, userId, userType, transactionType, invoiceIds, debitNoteIds,
-                        description, sellingCurrencyAmount, accountingCurrencyAmount, redirectUrl, checksumOK) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-$stmt->bind_param('isisssssddsi', $paymenttypeid, $transid, $userid, $usertype, $transactiontype, $invoiceids, $debitnoteids, $description,
-                                $sellingcurrencyamount, $accountingcurrencyamount, $redirecturl, $checksum_ok);
-
 $_GET = filter_var_array($_GET, FILTER_SANITIZE_STRING);
-                                
 
-// set parameters and execute
+// set parameters and check checksum
 
-if (isset($_GET["paymenttypeid"])){
-    $paymenttypeid = $_GET["paymenttypeid"];
-} else $paymenttypeid = NULL;
+$paymenttypeid = isset($_GET["paymenttypeid"]) ? $_GET["paymenttypeid"] : NULL;
+$transid = isset($_GET["transid"]) ? $_GET["transid"] : NULL;
+$userid = isset($_GET["userid"]) ? $_GET["userid"] : NULL;
+$usertype = isset($_GET["usertype"]) ? $_GET["usertype"] : NULL;
+$transactiontype = isset($_GET["transactiontype"]) ? $_GET["transactiontype"] : NULL;
+$invoiceids = isset($_GET["invoiceids"]) ? $_GET["invoiceids"] : NULL;
+$debitnoteids = isset($_GET["debitnoteids"]) ? $_GET["debitnoteids"] : NULL;
+$description = isset($_GET["description"]) ? $_GET["description"] : NULL;
+$sellingcurrencyamount = isset($_GET["sellingcurrencyamount"]) ? $_GET["sellingcurrencyamount"] : NULL;
+$accountingcurrencyamount = isset($_GET["accountingcurrencyamount"]) ? $_GET["accountingcurrencyamount"] : NULL;
+$redirecturl = isset($_GET["redirecturl"]) ? $_GET["redirecturl"] : NULL;
+$checksum = isset($_GET["checksum"]) ? $_GET["checksum"] : NULL;
 
-if (isset($_GET["transid"])){
-    $transid = $_GET["transid"];
-} else $transid = NULL;
-
-if (isset($_GET["userid"])) {
-    $userid = $_GET["userid"];
-} else $userid = NULL;
-
-if (isset($_GET["usertype"])) {
-    $usertype = $_GET["usertype"];
-} else $usertype = NULL;
-
-if (isset($_GET["transactiontype"])) {
-    $transactiontype = $_GET["transactiontype"];
-} else $transactiontype = NULL;
-
-if (isset($_GET["invoiceids"])) {
-    $invoiceids = $_GET["invoiceids"];
-} else $invoiceids = NULL;
-
-if (isset($_GET["debitnoteids"])) {
-    $debitnoteids = $_GET["debitnoteids"];
-} else $debitnoteids = NULL;
-
-if (isset($_GET["description"])) {
-    $description = $_GET["description"];
-} else $description = NULL;
-
-if (isset($_GET["sellingcurrencyamount"])) {
-    $sellingcurrencyamount = $_GET["sellingcurrencyamount"];
-} else $sellingcurrencyamount = NULL;
-
-if (isset($_GET["accountingcurrencyamount"])) {
-    $accountingcurrencyamount = $_GET["accountingcurrencyamount"];
-} else $accountingcurrencyamount = NULL;
-
-if (isset($_GET["redirecturl"])) {
-    $redirecturl = $_GET["redirecturl"];
-} else $redirecturl = NULL;
-
-if (isset($_GET["checksum"])) {
-    $checksum = $_GET["checksum"];
-} else $checksum = NULL;
-
-
-$checksum_ok = (int)verifyChecksum($paymenttypeid, $transid, $userid, $usertype, $transactiontype, $invoiceids, $debitnoteids, $description, $sellingcurrencyamount, $accountingcurrencyamount, $key, $checksum);
-
+$checksum_ok = (int)verifyChecksum($paymenttypeid, $transid, $userid, $usertype, $transactiontype, $invoiceids, $debitnoteids, $description, $sellingcurrencyamount, $accountingcurrencyamount, $checksum_secret, $checksum);
 if ($checksum_ok == 0) die("somone passed naughty bits to this script!");
 
-$stmt->execute();
-
-$payments_id = $stmt->insert_id;
 
 // now let's create an invoice with Greenfield API
 
-$client = new Invoice($host, $apiKey);
+$client = new Invoice($btcpay_url, $apikey);
 
 // resell.biz api user and key
-$api_userid = API_USER_ID;
-$api_key = 'LB_API_KEY';
+$api_userid = $resellerid;
+$api_key = $lbapikey;
 
-// default, will get overwritten with userdata below
-$country_code = "de";
-$user_email = "";
 
 //get country code from reseller or user
 if ($usertype == 'customer') {
@@ -132,7 +69,7 @@ if ($usertype == 'customer') {
 	$user_email = $result->useremail;
 
 }
-elseif ($usertype == 'reseller') {
+else{
 	$curl = curl_init('https://httpapi.com/api/resellers/details.json?auth-userid=' . $api_userid . '&api-key=' . $api_key . '&reseller-id=' . $userid);
         curl_setopt($curl, CURLOPT_FAILONERROR, true);
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
@@ -144,23 +81,38 @@ elseif ($usertype == 'reseller') {
         $user_email = $result->username;
 }
 
+srand((double)microtime()*1000000);
+$rkey = rand();
+
+$checksum_n = generateChecksum($transid,$sellingcurrencyamount,$accountingcurrencyamount,'N',$rkey,$checksum_secret);
+$checksum_y = generateChecksum($transid,$sellingcurrencyamount,$accountingcurrencyamount,'Y',$rkey,$checksum_secret);
+$checksum_p = generateChecksum($transid,$sellingcurrencyamount,$accountingcurrencyamount,'P',$rkey,$checksum_secret);
+
+
+$link_array = array(
+    'n_url' => $parseUrl = $redirecturl ."?transid=". urlencode($transid) . "&status=" . urlencode('N') . "&rkey=" . urlencode($rkey) . "&checksum=" . urlencode($checksum_n) . "&sellingamount=" . urlencode($sellingcurrencyamount) . "&accountingamount=" . urlencode($accountingcurrencyamount),
+    'y_url' => $parseUrl = $redirecturl ."?transid=". urlencode($transid) . "&status=" . urlencode('Y') . "&rkey=" . urlencode($rkey) . "&checksum=" . urlencode($checksum_y) . "&sellingamount=" . urlencode($sellingcurrencyamount) . "&accountingamount=" . urlencode($accountingcurrencyamount),
+    'p_url' => $parseUrl = $redirecturl ."?transid=". urlencode($transid) . "&status=" . urlencode('P') . "&rkey=" . urlencode($rkey) . "&checksum=" . urlencode($checksum_p) . "&sellingamount=" . urlencode($sellingcurrencyamount) . "&accountingamount=" . urlencode($accountingcurrencyamount)
+);
+
 $metadata = [
-   'buyerCountry' => $country_code,
-   'itemDesc' => $description,
-   'itemCode' => $transid
+    'buyerCountry' => $country_code,
+    'itemDesc' => $description,
+    'itemCode' => $transid,
+    'posData' => json_encode($link_array)
 ];
 
 $checkoutOptions = new InvoiceCheckoutOptions();
 $checkoutOptions
    ->setSpeedPolicy($checkoutOptions::SPEED_MEDIUM)
-   ->setRedirectURL('https://gateway.domorder.com/complete/?invoice_id={InvoiceId}&order_id={OrderId}&country_code=' . $country_code . '&user_email=' . $user_email);
+   ->setRedirectURL('https://' . $_SERVER['HTTP_HOST'] . '/returnurl.php?invoice_id={InvoiceId}');
 
 try{
    $invoice = $client->createInvoice(
-      $storeId,
+      $storeid,
+       "USD",
       PreciseNumber::parseString($sellingcurrencyamount),
-      "USD",
-      (string)$payments_id,
+      (string)$transid,
       $user_email,
       $metadata,
       $checkoutOptions
@@ -170,17 +122,6 @@ try{
    exit(1); // don't continue if a error occours
 }
 
-// configured store wide in BTCPayServer
-//$invoice->setNotificationUrl('https://gateway.domorder.com/btcpay/IPNlogger.php');
-
-$invoice_id = $invoice->getData()['id'];
-
-// record the $invoice->id in the database for later getting the status
-$stmt = $conn->prepare("UPDATE payments SET btcpay_id=? WHERE id=?");
-$stmt->bind_param('si', $invoice_id, $payments_id);
-$stmt->execute();
-
 header("Location: ".$invoice->getData()['checkoutLink']);
 
-$conn->close();
 ?>

@@ -1,32 +1,52 @@
 <?php
+/**
+ * @var string $btcpay_url
+ * @var string $storeid
+ * @var string $apikey
+ * @var string $lbapikey
+ * @var string $resellerid
+ * @var string $checksum_secret
+ * @var string $reseller_base_url
+ */
+
 // Include autoload file.
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
+
+// redirect user to setup.php if DB doesn't exist
+if (!file_exists(__DIR__ . '/private/config.inc.php')) {
+	header('Location: setup.php');
+	exit(0);
+}
+
+if (!isset($_GET['invoice_id'])) die("We need an invoice_id!");
+
+require __DIR__ . '/private/config.inc.php';
 
 // Import Invoice client class.
 use BTCPayServer\Client\Invoice;
 
-// Fill in with your BTCPay Server data.
-$apiKey = 'API_KEY';
-$host = 'https://gw.btcpay.host'; // e.g. https://your.btcpay-server.tld
-$storeId = 'STORE_ID';
-
 // Get information about a specific invoice.
 try {
-    $client = new Invoice($host, $apiKey);
-    $invoice = $client->getInvoice($storeId, $_GET['invoice_id']);
+    $client = new Invoice($btcpay_url, $apikey);
+    $invoice = $client->getInvoice($storeid, $_GET['invoice_id']);
 } catch (\Throwable $e) {
     echo "Error: " . $e->getMessage();
-    throw $e;
+    exit(1);
 }
 
 $state = $invoice->getData()['status'];
+$return_urls = json_decode($invoice->getData()['metadata']['posData'], true);
 
 if ($state == "Expired" || $state == "Invalid") {
-	header('Location: https://domorder.com/payment_timeout.html');
+	header('Location: ' . $return_urls['n_url']);
 	exit(0);
 }
-elseif ($state == "Settled" || $state == "Processing") {
-	header('Location: https://domorder.com/payment_success.html?order_id=' . $_GET['order_id'] . '&country_code=' . $_GET['country_code'] . '&user_email=' . $_GET['user_email']);
+elseif ($state == "Settled") {
+	header('Location: ' . $return_urls['y_url']);
+	exit(0);
+}
+elseif ($state == "Processing") {
+	header('Location: ' . $return_urls['p_url']);
 	exit(0);
 }
 else {
