@@ -8,3 +8,4 @@
 3. License the Code
 4. Ship it. :)
 5. Test it / Debug it / Fix it
+6. Sign everything
