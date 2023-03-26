@@ -1,23 +1,23 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#ins                                                                             talling-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "022dc7970a630ace256cba26bc440b56",
+    "content-hash": "502edf4165d67fdc087a45d237baadb3",
     "packages": [
         {
             "name": "btcpayserver/btcpayserver-greenfield-php",
-            "version": "v1.3.3",
+            "version": "v2.2.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/btcpayserver/btcpayserver-greenfield-php.git",
-                "reference": "aff6ab92151431c2faa63c72805aa60736b0deea"
+                "url": "https://github.com/btcpayserver/btcpayserver-greenfield-                                                                             php.git",
+                "reference": "a3456b527765d7a4642df66904963defee6f5a65"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/btcpayserver/btcpayserver-greenfield-php/zipball/aff6ab92151431c2faa63c72805aa60736b0deea",
-                "reference": "aff6ab92151431c2faa63c72805aa60736b0deea",
+                "url": "https://api.github.com/repos/btcpayserver/btcpayserver-g                                                                             reenfield-php/zipball/a3456b527765d7a4642df66904963defee6f5a65",
+                "reference": "a3456b527765d7a4642df66904963defee6f5a65",
                 "shasum": ""
             },
             "require": {
@@ -25,12 +25,13 @@
                 "ext-curl": "*",
                 "ext-json": "*",
                 "ext-mbstring": "*",
-                "php": ">=7.3.0"
+                "php": ">=8.0"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.0",
                 "phpunit/phpunit": "^9.5",
-                "vimeo/psalm": "^4.8"
+                "vimeo/psalm": "^4.8",
+                "vlucas/phpdotenv": "^5.5"
             },
             "type": "library",
             "autoload": {
@@ -54,10 +55,10 @@
             ],
             "description": "BTCPay Server Greenfield API PHP client library.",
             "support": {
-                "issues": "https://github.com/btcpayserver/btcpayserver-greenfield-php/issues",
-                "source": "https://github.com/btcpayserver/btcpayserver-greenfield-php/tree/v1.3.3"
+                "issues": "https://github.com/btcpayserver/btcpayserver-greenfie                                                                             ld-php/issues",
+                "source": "https://github.com/btcpayserver/btcpayserver-greenfie                                                                             ld-php/tree/v2.2.0"
             },
-            "time": "2022-05-21T15:11:12+00:00"
+            "time": "2023-03-10T09:46:56+00:00"
         }
     ],
     "packages-dev": [],
@@ -68,5 +69,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }
