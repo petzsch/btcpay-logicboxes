@@ -2,7 +2,7 @@
 
 ## Howto Run
 
-1. Copy project onto a Webserver with PHP 7.4+ support (make sure it runs under https://)
+1. Copy project onto a Webserver with PHP 8.0+ support (make sure it runs under https://)
 2. run `composer install` in the docroot of the project
 3. Create a custom payment gateway in your reseller control panel as described here: https://manage.resellerclub.com/kb/servlet/KBServlet/faq411.html#heading_1
 4. Create a Store and API Key in BTCPay as you would with any integration.
