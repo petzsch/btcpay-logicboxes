@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#ins                                                                             talling-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "502edf4165d67fdc087a45d237baadb3",
@@ -11,12 +11,12 @@
             "version": "v2.2.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/btcpayserver/btcpayserver-greenfield-                                                                             php.git",
+                "url": "https://github.com/btcpayserver/btcpayserver-greenfield-php.git",
                 "reference": "a3456b527765d7a4642df66904963defee6f5a65"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/btcpayserver/btcpayserver-g                                                                             reenfield-php/zipball/a3456b527765d7a4642df66904963defee6f5a65",
+                "url": "https://api.github.com/repos/btcpayserver/btcpayserver-greenfield-php/zipball/a3456b527765d7a4642df66904963defee6f5a65",
                 "reference": "a3456b527765d7a4642df66904963defee6f5a65",
                 "shasum": ""
             },
@@ -55,8 +55,8 @@
             ],
             "description": "BTCPay Server Greenfield API PHP client library.",
             "support": {
-                "issues": "https://github.com/btcpayserver/btcpayserver-greenfie                                                                             ld-php/issues",
-                "source": "https://github.com/btcpayserver/btcpayserver-greenfie                                                                             ld-php/tree/v2.2.0"
+                "issues": "https://github.com/btcpayserver/btcpayserver-greenfield-php/issues",
+                "source": "https://github.com/btcpayserver/btcpayserver-greenfield-php/tree/v2.2.0"
             },
             "time": "2023-03-10T09:46:56+00:00"
         }
