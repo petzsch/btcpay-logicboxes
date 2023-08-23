@@ -35,7 +35,7 @@ try {
 }
 
 $state = $invoice->getData()['status'];
-$return_urls = json_decode($invoice->getData()['metadata']['posData'], true);
+$return_urls = $invoice->getData()['metadata']['posData'];
 
 if ($state == "Expired" || $state == "Invalid") {
 	header('Location: ' . $return_urls['n_url']);

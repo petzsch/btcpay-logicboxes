@@ -99,7 +99,7 @@ $metadata = [
     'buyerCountry' => $country_code,
     'itemDesc' => $description,
     'itemCode' => $transid,
-    'posData' => json_encode($link_array)
+    'posData' => $link_array
 ];
 
 $checkoutOptions = new InvoiceCheckoutOptions();
